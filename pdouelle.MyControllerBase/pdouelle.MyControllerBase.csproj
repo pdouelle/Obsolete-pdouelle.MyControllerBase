@@ -2,6 +2,12 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <PackageId>pdouelle.MyControllerBase</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Philippe DOUELLE</Authors>
+        <Company>BETTERIT</Company>
+        <RootNamespace>pdouelle.MyControllerBase</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>

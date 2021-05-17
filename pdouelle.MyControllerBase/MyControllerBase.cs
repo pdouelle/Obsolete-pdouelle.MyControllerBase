@@ -24,7 +24,13 @@ namespace pdouelle.MyControllerBase
     {
         protected readonly IMediator Mediator;
         protected readonly IMapper Mapper;
-        
+
+        public MyControllerBase(IMediator mediator, IMapper mapper)
+        {
+            Mediator = mediator;
+            Mapper = mapper;
+        }
+
         /// <summary>
         /// Get all
         /// </summary>
