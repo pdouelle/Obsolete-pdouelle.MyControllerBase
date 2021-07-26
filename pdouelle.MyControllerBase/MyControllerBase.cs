@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
@@ -36,32 +37,35 @@ namespace pdouelle.MyControllerBase
         /// </summary>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public virtual async Task<IActionResult> GetList<TQueryList>([FromQuery] TQueryList request) 
+        public virtual async Task<IActionResult> GetList<TQueryList>([FromQuery] TQueryList request, CancellationToken cancellationToken) 
         {
             IEnumerable<TEntity> response = await Mediator.Send(new ListQueryModel<TEntity, TQueryList>
             {
                 Request = request
-            });
+            }, cancellationToken);
 
             var mappedResponse = Mapper.Map<IEnumerable<TDto>>(response);
 
             return Ok(mappedResponse);
         }
-        
+
         /// <summary>
         /// Get by id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> GetById(Guid id, [FromQuery] TQueryById request)
+        public virtual async Task<IActionResult> GetById(Guid id, [FromQuery] TQueryById request, CancellationToken cancellationToken)
         {
+            request.Id = id;
+            
             TEntity response = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = request
-            });
+            }, cancellationToken);
 
             if (response == null) return NotFound();
 
@@ -75,34 +79,35 @@ namespace pdouelle.MyControllerBase
         /// </summary>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public virtual async Task<IActionResult> Create<TCreate>([FromBody] TCreate request)
+        public virtual async Task<IActionResult> Create<TCreate>([FromBody] TCreate request, CancellationToken cancellationToken)
         {
             TEntity entity = await Mediator.Send(new CreateCommandModel<TEntity, TCreate>
             {
                 Request = request
-            });
+            }, cancellationToken);
 
-            await Mediator.Send(new SaveCommandModel<TEntity>());
+            await Mediator.Send(new SaveCommandModel<TEntity>(), cancellationToken);
 
             var mappedResponse = Mapper.Map<TDto>(entity);
 
             return CreatedAtAction(nameof(GetById), new {id = mappedResponse.Id}, mappedResponse);
         }
-        
+
         /// <summary>
         /// Update
         /// </summary>
         /// <param name="id"></param>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Update<TUpdate>(Guid id, [FromBody] TUpdate request) 
+        public virtual async Task<IActionResult> Update<TUpdate>(Guid id, [FromBody] TUpdate request, CancellationToken cancellationToken) 
         {
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = new TQueryById {Id = id}
-            });
+            }, cancellationToken);
 
             if (entity == null) return NotFound();
 
@@ -110,30 +115,31 @@ namespace pdouelle.MyControllerBase
             {
                 Entity = entity,
                 Request = request
-            });
+            }, cancellationToken);
 
-            await Mediator.Send(new SaveCommandModel<TEntity>());
+            await Mediator.Send(new SaveCommandModel<TEntity>(), cancellationToken);
 
             var mappedResponse = Mapper.Map<TDto>(entity);
 
             return Ok(mappedResponse);
         }
-        
+
         /// <summary>
         /// Patch
         /// </summary>
         /// <param name="id"></param>
         /// <param name="patchDocument"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Patch<TPatch>(Guid id, [FromBody] JsonPatchDocument<TPatch> patchDocument)
+        public virtual async Task<IActionResult> Patch<TPatch>(Guid id, [FromBody] JsonPatchDocument<TPatch> patchDocument, CancellationToken cancellationToken)
             where TPatch : class, new()
         {
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = new TQueryById {Id = id}
-            });
+            }, cancellationToken);
 
             if (entity == null) return NotFound();
 
@@ -144,29 +150,30 @@ namespace pdouelle.MyControllerBase
             {
                 Entity = entity,
                 Request = request
-            });
+            }, cancellationToken);
 
-            await Mediator.Send(new SaveCommandModel<TEntity>());
+            await Mediator.Send(new SaveCommandModel<TEntity>(), cancellationToken);
 
             var mappedResponse = Mapper.Map<TDto>(response);
 
             return Ok(mappedResponse);
         }
-        
+
         /// <summary>
         /// Delete
         /// </summary>
         /// <param name="id"></param>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Delete<TDelete>(Guid id, [FromQuery] TDelete request)
+        public virtual async Task<IActionResult> Delete<TDelete>(Guid id, [FromQuery] TDelete request, CancellationToken cancellationToken)
         {
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = new TQueryById {Id = id}
-            });
+            }, cancellationToken);
 
             if (entity == null) return NotFound();
 
@@ -174,9 +181,9 @@ namespace pdouelle.MyControllerBase
             {
                 Entity = entity,
                 Request = request
-            });
+            }, cancellationToken);
 
-            await Mediator.Send(new SaveCommandModel<TEntity>());
+            await Mediator.Send(new SaveCommandModel<TEntity>(), cancellationToken);
 
             return NoContent();
         }
