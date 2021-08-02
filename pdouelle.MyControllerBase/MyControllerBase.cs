@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -131,15 +132,15 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Patch<TPatch>([FromBody] JsonPatchDocument<TPatch> patchDocument, CancellationToken cancellationToken)
-            where TPatch : class, IEntity, new()
+        public virtual async Task<IActionResult> Patch<TPatch>(Guid id, [FromBody] JsonPatchDocument<TPatch> patchDocument, CancellationToken cancellationToken)
+            where TPatch : class, new()
         {
             var request = new TPatch();
             patchDocument.ApplyTo(request);
             
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
-                Request = new TQueryById {Id = request.Id}
+                Request = new TQueryById {Id = id}
             }, cancellationToken);
 
             if (entity == null) return NotFound();
