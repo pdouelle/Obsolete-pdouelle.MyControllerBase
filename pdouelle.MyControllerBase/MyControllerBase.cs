@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -58,10 +57,8 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> GetById(Guid id, [FromQuery] TQueryById request, CancellationToken cancellationToken)
+        public virtual async Task<IActionResult> GetById([FromQuery] TQueryById request, CancellationToken cancellationToken)
         {
-            request.Id = id;
-            
             TEntity response = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = request
@@ -102,11 +99,12 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Update<TUpdate>(Guid id, [FromBody] TUpdate request, CancellationToken cancellationToken) 
+        public virtual async Task<IActionResult> Update<TUpdate>([FromBody] TUpdate request, CancellationToken cancellationToken) 
+            where TUpdate : IEntity
         {
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
-                Request = new TQueryById {Id = id}
+                Request = new TQueryById {Id = request.Id}
             }, cancellationToken);
 
             if (entity == null) return NotFound();
@@ -133,18 +131,18 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Patch<TPatch>(Guid id, [FromBody] JsonPatchDocument<TPatch> patchDocument, CancellationToken cancellationToken)
-            where TPatch : class, new()
+        public virtual async Task<IActionResult> Patch<TPatch>([FromBody] JsonPatchDocument<TPatch> patchDocument, CancellationToken cancellationToken)
+            where TPatch : class, IEntity, new()
         {
+            var request = new TPatch();
+            patchDocument.ApplyTo(request);
+            
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
-                Request = new TQueryById {Id = id}
+                Request = new TQueryById {Id = request.Id}
             }, cancellationToken);
 
             if (entity == null) return NotFound();
-
-            var request = new TPatch();
-            patchDocument.ApplyTo(request);
 
             TEntity response = await Mediator.Send(new PatchCommandModel<TEntity, TPatch>
             {
@@ -168,11 +166,12 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Delete<TDelete>(Guid id, [FromQuery] TDelete request, CancellationToken cancellationToken)
+        public virtual async Task<IActionResult> Delete<TDelete>([FromQuery] TDelete request, CancellationToken cancellationToken)
+            where TDelete : IEntity
         {
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
-                Request = new TQueryById {Id = id}
+                Request = new TQueryById {Id = request.Id}
             }, cancellationToken);
 
             if (entity == null) return NotFound();
