@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>pdouelle.MyControllerBase</PackageId>
-        <Version>1.0.5</Version>
+        <Version>1.0.6</Version>
         <Authors>Philippe DOUELLE</Authors>
         <Company>BETTERIT</Company>
         <RootNamespace>pdouelle.MyControllerBase</RootNamespace>
@@ -13,8 +13,8 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="MediatR" Version="9.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
-      <PackageReference Include="Microsoft.Identity.Web" Version="1.15.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+      <PackageReference Include="Microsoft.Identity.Web" Version="1.16.1" />
       <PackageReference Include="pdouelle.GenericMediatR" Version="1.0.0" />
     </ItemGroup>
 

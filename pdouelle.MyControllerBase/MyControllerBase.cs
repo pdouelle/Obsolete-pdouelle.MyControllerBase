@@ -100,9 +100,11 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Update<TUpdate>([FromBody] TUpdate request, CancellationToken cancellationToken) 
+        public virtual async Task<IActionResult> Update<TUpdate>(Guid id, [FromBody] TUpdate request, CancellationToken cancellationToken) 
             where TUpdate : IEntity
         {
+            request.Id = id;
+            
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = new TQueryById {Id = request.Id}
@@ -167,9 +169,11 @@ namespace pdouelle.MyControllerBase
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public virtual async Task<IActionResult> Delete<TDelete>([FromQuery] TDelete request, CancellationToken cancellationToken)
+        public virtual async Task<IActionResult> Delete<TDelete>(Guid id, [FromQuery] TDelete request, CancellationToken cancellationToken)
             where TDelete : IEntity
         {
+            request.Id = id;
+            
             TEntity entity = await Mediator.Send(new IdQueryModel<TEntity, TQueryById>
             {
                 Request = new TQueryById {Id = request.Id}
